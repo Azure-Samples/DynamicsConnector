@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicsConnector.Dynamics"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamicsConnector.Dynamics.Functions", "DynamicsConnector.Dynamics.Functions\DynamicsConnector.Dynamics.Functions.csproj", "{F8490D30-DC9F-4C13-BCFF-3F5D646361EF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicsConnector.SqlDb", "DynamicsConnector.SqlDb\DynamicsConnector.SqlDb.csproj", "{0EF2B30F-927B-48C4-BF94-9E4891A99D63}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamicsConnector.SqlDb.Functions", "DynamicsConnector.SqlDb.Functions\DynamicsConnector.SqlDb.Functions.csproj", "{1CC9C630-6A62-4CAE-8E82-49A7847DFF19}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{F8490D30-DC9F-4C13-BCFF-3F5D646361EF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F8490D30-DC9F-4C13-BCFF-3F5D646361EF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F8490D30-DC9F-4C13-BCFF-3F5D646361EF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0EF2B30F-927B-48C4-BF94-9E4891A99D63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0EF2B30F-927B-48C4-BF94-9E4891A99D63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0EF2B30F-927B-48C4-BF94-9E4891A99D63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0EF2B30F-927B-48C4-BF94-9E4891A99D63}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CC9C630-6A62-4CAE-8E82-49A7847DFF19}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CC9C630-6A62-4CAE-8E82-49A7847DFF19}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CC9C630-6A62-4CAE-8E82-49A7847DFF19}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CC9C630-6A62-4CAE-8E82-49A7847DFF19}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
