@@ -1,57 +1,13 @@
-# Project Name
+# Provision a Dynamics Connector Services from GitHub
 
-(short, 1-3 sentenced, description of the project)
+<a href="https://portal.azure.com/#create/Microsoft.Template/uri/https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2FDynamicsConnector%2Fmaster%2Fdeployment%2Fazuredeploy.json%3Ftoken%3DAF2BWF4UE3BZMFTZCCMTWLK4ZHM5E" target="_blank">
+    <img src="http://azuredeploy.net/deploybutton.png"/>
+</a>
+<a href="http://armviz.io/#/?load=https%3A%2F%2Fraw.githubusercontent.com%2FAzure-Samples%2FDynamicsConnector%2Fmaster%2Fdeployment%2Fazuredeploy.json%3Ftoken%3DAF2BWF4UE3BZMFTZCCMTWLK4ZHM5E" target="_blank">
+    <img src="http://armviz.io/visualizebutton.png"/>
+</a>
 
-## Features
+## Overview
 
-This project framework provides the following features:
-
-* Feature 1
-* Feature 2
-* ...
-
-## Getting Started
-
-### Prerequisites
-
-(ideally very short, if any)
-
-- OS
-- Library version
-- ...
-
-### Installation
-
-(ideally very short)
-
-- npm install [package name]
-- mvn install
-- ...
-
-### Quickstart
-(Add steps to get up and running quickly)
-
-1. git clone [repository clone url]
-2. cd [respository name]
-3. ...
-
-
-## Demo
-
-A demo app is included to show how to use the project.
-
-To run the demo, follow these steps:
-
-(Add steps to start up the demo)
-
-1.
-2.
-3.
-
-## Resources
-
-(Any additional resources or related projects)
-
-- Link to supporting information
-- Link to similar sample
-- ...
+![Solution Overview Diagram](/docs/media/CFS_I2D_Lite.png)
+The Dynamics 365 connector from Microsoft uses a number of Azure services (Azure Functions, Azure Service Bus, and Azure Storage) with custom code and configuration (JSON) files to establish a two-way communication between any SQL DB and Dynamics 365. The connector is built in a modular fashion. One module queries the SQL DB, another connects to Dynamics 365, and code in the middle performs any needed data transformations to convert incoming data into a form that Dynamics 365 can read. With this modular architecture different data sources can be synchronized with Dynamics.
