@@ -9,5 +9,5 @@
 
 ## Overview
 
-![Solution Overview Diagram](/docs/media/CFS_I2D_Lite.png)
+![Solution Overview Diagram](/docs/media/DynamicsConnectorLite.jpg)
 The Dynamics 365 connector from Microsoft uses a number of Azure services (Azure Functions, Azure Service Bus, and Azure Storage) with custom code and configuration (JSON) files to establish a two-way communication between any SQL DB and Dynamics 365. The connector is built in a modular fashion. One module queries the SQL DB, another connects to Dynamics 365, and code in the middle performs any needed data transformations to convert incoming data into a form that Dynamics 365 can read. With this modular architecture different data sources can be synchronized with Dynamics.
