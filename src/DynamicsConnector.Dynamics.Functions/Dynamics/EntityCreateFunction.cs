@@ -52,7 +52,7 @@ namespace DynamicsConnector.Dynamics.Functions.Dynamics
                 {
                     foreach(var k in entityMapper)
                     {
-                        if (message.EntityDetails.ContainsKey(k.Key))
+                        if (message.EntityDetails.ContainsKey(k.Key) && !entityDetails.ContainsKey(k.Value))
                             entityDetails.Add(k.Value, message.EntityDetails[k.Key]);
                     }
                 }
@@ -69,7 +69,7 @@ namespace DynamicsConnector.Dynamics.Functions.Dynamics
             }
             catch (Exception exception)
             {
-                log.LogError($"Function 'AlertCreate' Exeption: {0} {1}", exception.Message, exception.InnerException != null ? exception.InnerException.Message :"");
+                log.LogError($"Function 'AlertCreate' Exeption: {exception.Message} {exception.InnerException ?? exception.InnerException}");
             }
             finally
             {

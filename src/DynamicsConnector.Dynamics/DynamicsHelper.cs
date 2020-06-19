@@ -30,7 +30,7 @@ namespace DynamicsConnector.Dynamics
         {
             this.crmorg = crmorg;
             this.user = user;
-            this.password = password;            
+            this.password = password;
             this.Logger = logger;
 
             organizationProxy = GetOrganizationServiceProxy(crmorg, user, password);
@@ -40,7 +40,15 @@ namespace DynamicsConnector.Dynamics
         {
             try
             {
-                DataCollection<Entity> entytiesCollection = GetEntityInstances(organizationProxy, entityName, new Dictionary<string, object>() { { entityToken, entityDetails[entityToken] } });
+                object token = entityDetails.ContainsKey(entityToken) ? entityDetails[entityToken] : entityToken;
+
+                DataCollection<Entity> entytiesCollection = GetEntityInstances(organizationProxy, entityName, new Dictionary<string, object>
+                {
+                    {
+                        entityToken,
+                        token
+                    }
+                });
 
                 if (entytiesCollection == null || entytiesCollection.Count == 0)
                 {
@@ -53,7 +61,7 @@ namespace DynamicsConnector.Dynamics
                     }
                 }
                 else
-                if(update)
+                if (update)
                 {
                     Entity currentEntity = entytiesCollection.First();
                     UpdateEntityAttributes(currentEntity, entityDetails);
@@ -95,8 +103,8 @@ namespace DynamicsConnector.Dynamics
 
                     if (entityDetail.Value != null && HasValueChanged(currentEntity, entityMetadata, entityDetail))
                     {
-                        changed = true;                        
-                        this.ApplyNewValue(currentEntity, entityMetadata, entityDetail);                        
+                        changed = true;
+                        this.ApplyNewValue(currentEntity, entityMetadata, entityDetail);
                     }
                 }
                 if (changed)
@@ -121,15 +129,21 @@ namespace DynamicsConnector.Dynamics
         private bool HasValueChanged(Entity currentEntity, AttributeMetadata entityMetadata, KeyValuePair<string, object> entityDetail)
         {
             var key = MainKey(entityDetail.Key);
+
             if (!currentEntity.Attributes.Contains(key))
-                return false;
+            {
+                if (entityMetadata != null)
+                    return true;
+                else
+                    return false;
+            }
 
-            var entityType = currentEntity[key].GetType(); 
+            var entityType = currentEntity[key].GetType();
 
-            switch (currentEntity[key])
+            switch (currentEntity[key])            
             {
                 case string val:
-                    if(val != entityDetail.Value.ToString())
+                    if (val != entityDetail.Value.ToString())
                         return true;
                     break;
 
@@ -172,26 +186,26 @@ namespace DynamicsConnector.Dynamics
                 case EntityReference er:
                     return er.Name != entityDetail.Value.ToString();
 
-                case OptionSetValue osv:                    
+                case OptionSetValue osv:
                     int iosv;
                     OptionMetadata currentOption;
                     if (int.TryParse(entityDetail.Value.ToString(), out iosv))
                     {
-                        currentOption = ((EnumAttributeMetadata)entityMetadata).OptionSet.Options.First(o => o.Value == iosv);                        
-                    }                        
+                        currentOption = ((EnumAttributeMetadata)entityMetadata).OptionSet.Options.First(o => o.Value == iosv);
+                    }
                     else
                     {
-                        currentOption = ((EnumAttributeMetadata)entityMetadata).OptionSet.Options.First(o => o.Label.LocalizedLabels.First().Label.ToLower() == entityDetail.Value.ToString().ToLower());                        
+                        currentOption = ((EnumAttributeMetadata)entityMetadata).OptionSet.Options.First(o => o.Label.LocalizedLabels.First().Label.ToLower() == entityDetail.Value.ToString().ToLower());
                     }
-                    return osv.Value != currentOption.Value;                    
+                    return osv.Value != currentOption.Value;
 
                 default:
-                    return false;                    
-            }                
+                    return false;
+            }
 
             return false;
         }
-        
+
         internal Entity BuildEntityInstance(OrganizationServiceProxy organizationProxy, IDictionary<string, object> entityDetails, string entityName, string missingMappingfield = null)
         {
             try
@@ -200,7 +214,7 @@ namespace DynamicsConnector.Dynamics
 
                 //Creating new Alert
                 Entity dynamicsEntity = new Entity(entityName);
-                StringBuilder otherInfo = new StringBuilder();                                
+                StringBuilder otherInfo = new StringBuilder();
 
                 foreach (var keyWithPrefix in entityDetails.Keys)
                 {
@@ -217,20 +231,20 @@ namespace DynamicsConnector.Dynamics
                     if (dynamicsEntityProperties != null && dynamicsEntityProperties.Any(a => a.LogicalName == key))
                     {
                         var entityMetadata = dynamicsEntityProperties.First(a => a.LogicalName == key);
-                        
+
                         ApplyNewValue(dynamicsEntity, entityMetadata, entityDetails[keyWithPrefix], key, lookUpKey);
                     }
                     else
-                        if (entityDetails[key] != null)
+                        if (entityDetails.ContainsKey(key) && entityDetails[key] != null)
                     {
                         otherInfo.AppendLine($"{key} - {entityDetails[key]}");
                     }
                 }
 
-                if(missingMappingfield != null && !string.IsNullOrEmpty(missingMappingfield) && dynamicsEntityProperties.Any(a => a.LogicalName == missingMappingfield))
+                if (missingMappingfield != null && !string.IsNullOrEmpty(missingMappingfield) && dynamicsEntityProperties.Any(a => a.LogicalName == missingMappingfield))
                 {
                     dynamicsEntity.Attributes[missingMappingfield] = otherInfo.ToString();
-                }                
+                }
 
                 return dynamicsEntity;
             }
@@ -280,7 +294,7 @@ namespace DynamicsConnector.Dynamics
                             Logger.LogWarning("Adding new field to Option Set");
                             int maxVal = picklistAttributeMetadata.OptionSet.Options.Max(o => o.Value) ?? 0;
                             int? value = AddOptionSetItem(dynamicsEntity.LogicalName, key, entityDetail, maxVal + 10);
-                            if(value != null)
+                            if (value != null)
                                 dynamicsEntity.Attributes[key] = new OptionSetValue(value ?? -1);
                         }
                     }
@@ -353,7 +367,7 @@ namespace DynamicsConnector.Dynamics
                     else Logger.LogWarning($"Wasn't able to convert property {key} with data {entityDetail} to Boolean!");
                     break;
 
-                case AttributeTypeCode.Customer:               
+                case AttributeTypeCode.Customer:
                     refKey = ((LookupAttributeMetadata)entityMetadata).Targets.FirstOrDefault();
                     entities = GetEntityInstances(organizationProxy, refKey, new Dictionary<string, object> { { lookUpKey, entityDetail } });
                     if (entities != null && entities.Any())
@@ -366,11 +380,11 @@ namespace DynamicsConnector.Dynamics
                 case AttributeTypeCode.Status:
                 case AttributeTypeCode.State:
                     int istate;
-                    if (int.TryParse(entityDetail.ToString(), out istate))  
+                    if (int.TryParse(entityDetail.ToString(), out istate))
                         dynamicsEntity.Attributes[key] = new OptionSetValue(istate);
                     else
                     {
-                        var option =((EnumAttributeMetadata)entityMetadata).OptionSet.Options.Last(o => o.Label.LocalizedLabels.First().Label.ToLower() == entityDetail.ToString().ToLower());
+                        var option = ((EnumAttributeMetadata)entityMetadata).OptionSet.Options.Last(o => o.Label.LocalizedLabels.First().Label.ToLower() == entityDetail.ToString().ToLower());
                         if (option != null)
                             dynamicsEntity.Attributes[key] = new OptionSetValue(option.Value ?? 1);
                     }
@@ -396,7 +410,7 @@ namespace DynamicsConnector.Dynamics
 
                 return ((InsertOptionValueResponse)organizationProxy.Execute(insertOptionValueRequest)).NewOptionValue;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return null;
             }
@@ -438,29 +452,29 @@ namespace DynamicsConnector.Dynamics
                     ColumnSet = new ColumnSet(true)
                 };
 
-                if(conditions == null || !conditions.Any())
+                if (conditions == null || !conditions.Any())
                 {
                     alertsQuery.Criteria.Conditions.Add(
                         new ConditionExpression
                         {
-                            AttributeName = "createdon",                            
+                            AttributeName = "createdon",
                             Operator = ConditionOperator.NotEqual,
                             Values = { DateTime.MaxValue }
                         }
                         );
                 }
                 else
-                foreach (var condition in conditions)
-                {
-                    alertsQuery.Criteria.Conditions.Add(
-                        new ConditionExpression
-                        {
-                            AttributeName = condition.Key,
-                            Operator = ConditionOperator.Equal,
-                            Values = { condition.Value == null ? "Unknown" : condition.Value.ToString() }
-                        }
-                        );
-                }
+                    foreach (var condition in conditions)
+                    {
+                        alertsQuery.Criteria.Conditions.Add(
+                            new ConditionExpression
+                            {
+                                AttributeName = condition.Key,
+                                Operator = ConditionOperator.Equal,
+                                Values = { condition.Value == null ? "Unknown" : condition.Value.ToString() }
+                            }
+                            );
+                    }
 
                 var res = organizationProxy.RetrieveMultiple(alertsQuery);
                 return res.Entities;
@@ -474,7 +488,7 @@ namespace DynamicsConnector.Dynamics
 
         public void DeleteInstance(string entityName, Guid id)
         {
-            organizationProxy.Delete(entityName, id);            
+            organizationProxy.Delete(entityName, id);
         }
 
         private OrganizationServiceProxy GetOrganizationServiceProxy(string url, string user, string password)

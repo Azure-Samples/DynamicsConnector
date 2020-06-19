@@ -21,7 +21,7 @@ namespace DynamicsConnector.SqlDb.Functions
         private static ConnectionStringSettings dataBaseConnectionString = ConfigurationManager.ConnectionStrings["SourceDB_CS"];
         private static string sourceDataTable = ConfigurationManager.AppSettings["SourceDataTable"];
 
-        private static string serviceBusConnectionString = ConfigurationManager.AppSettings["ServiceBusCS"];
+        private static string serviceBusConnectionString = ConfigurationManager.AppSettings["AzureWebJobsServiceBus"];
         private static string dynamicsInstanceCreateQueue = ConfigurationManager.AppSettings["DynamicsInstanceCreateQueue"];
         private static string dynamicsEntityName = ConfigurationManager.AppSettings["DynamicsEntityName"];
         private static string dynamicsEntityToken = ConfigurationManager.AppSettings["DynamicsEntityToken"];
@@ -29,11 +29,16 @@ namespace DynamicsConnector.SqlDb.Functions
         private static bool update = false;
 
         [FunctionName("SqlDbProviderFunction")]
-        public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger logger)        
-        {           
-            RunAsync(logger).GetAwaiter().GetResult();
-            return;
+        public static async Task<HttpResponseMessage> Run([HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)]HttpRequestMessage req, ILogger log)
+        {
+            await RunAsync(log);
+            return req.CreateResponse(HttpStatusCode.OK, "Faults publisher function! See details in log.");
         }
+        //public static void Run([TimerTrigger("0 */5 * * * *")]TimerInfo myTimer, ILogger logger)        
+        //{           
+        //    RunAsync(logger).GetAwaiter().GetResult();
+        //    return;
+        //}
 
         public static async Task RunAsync(ILogger logger)
         {
@@ -58,8 +63,14 @@ namespace DynamicsConnector.SqlDb.Functions
                 {
                     var message = new InstanceCreateMessage(dynamicsEntityName, dynamicsEntityToken, sourceItem, update) { MissingMappingField = missingMappingField };
 
-                    await dataDestination.PostDataAsync<InstanceCreateMessage>(message, new string[] { serviceBusConnectionString, "", dynamicsInstanceCreateQueue, "" });
-                    break;
+                    try
+                    {
+                        await dataDestination.PostDataAsync<InstanceCreateMessage>(message, new string[] { serviceBusConnectionString, "", dynamicsInstanceCreateQueue, "" });
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError(ex.Message);
+                    }                    
                 }
 
                 logger.LogInformation("Iteration over Faults is completed!");
