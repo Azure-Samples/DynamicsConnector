@@ -1,0 +1,24 @@
+{
+    "Id":"00000000-0000-0000-0000-000000000000",
+    "DynamicsEntityName":"msdyn_workorder",
+    "DynamicsEntityToken":"msdyn_name",
+    "EntityDetails":{
+       "WorkOrderNumber":"Fan Motor Speed > 1200 RPM at Microsoft/North America/Seattle/BuildingA",
+       "ServiceAccount":"MTC Seattle",
+       "SystemStatus":"Open - Unscheduled",
+       "Substatus":"Ready to be Scheduled",
+       "WorkOrderSummary":"Fan Motor Speed > 1200 RPM at Microsoft/North America/Seattle/BuildingA activated at 6/19/2020 10:27:07 AM +03:00",
+       "WorkOrderType":"Comfort",
+       "PriceList":"Default PriceList",
+       "CustomerAsset":"Microsoft/North America/Seattle/BuildingA",
+       "IncidentType":"VFD fan motor",
+       "IncidentDuration":15,
+       "Priority":"Medium",
+       "ServiceTerritory":"Seattle",
+       "Instructions":"1) Open Iconics VFD management portal 2) Slow down Fan speed!",
+       "IoTAlert":"3d2b06a3bc7913001234567890000000000e94511bfb367eb2aa6c88ef439053"
+    },
+    "MissingMappingField":"msdyn_bookingsummary",
+    "Update":true
+ }
+ 

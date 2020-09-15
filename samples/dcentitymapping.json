@@ -1,0 +1,63 @@
+{
+    "msdyn_iotalert": {
+        "FaultName": "msdyn_description",
+        "AssetPath": "msdyn_deviceid",
+        "FaultId": "msdyn_alerttoken",
+        "AssetId": "msdyn_customerasset___msdyn_deviceid",
+        "FaultActiveTime": "msdyn_alerttime",
+        "IncidentId": "msdyn_alerttoken",
+        "AlertType": "msdyn_alerttype",
+        "Territory": "new_territory___name"
+    },
+    "incident":{
+        "CaseTitle":"title",
+        "Customer":"customerid___accountnumber",
+        "Origin": "caseorigincode",
+        "IoTAlert": "msdyn_iotalert___msdyn_iotalertid"
+    },
+    "msdyn_customerasset": {
+        "FaultName": "msdyn_description",
+        "FaultId": "msdyn_alerttoken"
+    },
+    "msdyn_workorder":{
+        "WorkOrderNumber":"msdyn_name",
+        "ServiceAccount":"msdyn_serviceaccount___accountnumber",
+        "ServiceAccountId":"msdyn_serviceaccount",        
+        "SystemStatus":"msdyn_systemstatus",        
+        "WorkOrderType":"msdyn_workordertype___msdyn_name",
+        "PriceList":"msdyn_pricelist___name",
+        "Taxable":"msdyn_taxable",
+        
+        "WorkOrderSummary":"msdyn_workordersummary",
+        
+        "CustomerAsset":"msdyn_customerasset___msdyn_deviceid",
+        "IncidentType":"msdyn_primaryincidenttype___msdyn_name",
+        "IncidentDuration":"msdyn_primaryincidentestimatedduration",        
+        "Case":"msdyn_servicerequest",
+        "IoTAlert":"msdyn_iotalert___msdyn_alerttoken",
+        "IoTAlertId":"msdyn_iotalert___msdyn_iotalertid",
+        "Priority":"msdyn_priority___msdyn_name",
+        "ServiceTerritory":"msdyn_serviceterritory___name",
+        "Instructions":"msdyn_instructions",
+        "County":"msdyn_country",
+        "City":"msdyn_City",
+        "Latitude":"msdyn_Latitude",
+        "Longitude":"msdyn_Longitude",
+
+        "BillingAccount":"msdyn_billingaccount___name",
+        "Substatus":"msdyn_substatus___msdyn_name",
+        "Document":"hmt_document",
+        "Image":"hmt_image",
+        "Video":"hmt_video"
+    },
+    "bookableresourcebooking":{
+        "Duration":"duration",
+        "StartTime":"starttime",
+        "EndTime":"endtime",
+        "BookingStatus":"bookingstatus___name",
+        "Resource":"resource___name",
+        "Name":"name",
+        "ResourceRequirement":"msdyn_resourcerequirement___msdyn_name"
+    }
+
+}
