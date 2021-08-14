@@ -4,8 +4,8 @@
     <AzureFunctionsVersion>v1</AzureFunctionsVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.Azure.WebJobs.ServiceBus" Version="2.2.0" />
-    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.26" />
+    <PackageReference Include="Microsoft.Azure.WebJobs.ServiceBus" Version="3.0.0-beta8" />
+    <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="3.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DynamicsConnector.Core\DynamicsConnector.Core.csproj" />
