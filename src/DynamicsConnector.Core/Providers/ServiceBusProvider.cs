@@ -15,14 +15,29 @@ namespace DynamicsConnector.Core.Providers
         {
             try
             {
-                var sender = GetSender(parameters);
-
                 foreach (var dataItem in data)
                 {
                     var serializedMessage = JsonConvert.SerializeObject(dataItem);
                     var payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedMessage));
+                    string cs = parameters[0], topic = parameters[1], queue = parameters[2];
+
+                    var client = new ServiceBusClient(cs);
                     var msg = new ServiceBusMessage(payloadStream.ToString());
-                    sender.SendMessageAsync(msg);
+                    if (parameters.Length != 4)
+                    {
+                        throw new ArgumentException("Wrong Parameters Count");
+                    }
+                    else if (string.IsNullOrEmpty(topic))
+                    {
+                        ServiceBusSender queueSender = client.CreateSender(queue);
+                        msg.ApplicationProperties["Status"] = parameters[3];
+                        await queueSender.SendMessageAsync(msg);
+                    }
+                    else
+                    {
+                        ServiceBusSender topicSender = client.CreateSender(topic);
+                        await topicSender.SendMessageAsync(msg);
+                    }
                 }
             }
             catch (Exception ex)
@@ -35,14 +50,26 @@ namespace DynamicsConnector.Core.Providers
         {
             try
             {
-                var sender = GetSender(parameters);
-
                 var serializedMessage = JsonConvert.SerializeObject(dataItem);
                 var payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedMessage));
-
+                string cs = parameters[0], topic = parameters[1], queue = parameters[2];
+                var client = new ServiceBusClient(cs);
                 var msg = new ServiceBusMessage(payloadStream.ToString());
-                sender.SendMessageAsync(msg);
-
+                if (parameters.Length != 4)
+                {
+                    throw new ArgumentException("Wrong Parameters Count");
+                }
+                else if (string.IsNullOrEmpty(topic))
+                {
+                    ServiceBusSender queueSender = client.CreateSender(queue);
+                    msg.ApplicationProperties["Status"] = parameters[3];
+                    await queueSender.SendMessageAsync(msg);
+                }
+                else
+                {
+                    ServiceBusSender topicSender = client.CreateSender(topic);
+                    await topicSender.SendMessageAsync(msg);
+                }
             }
             catch (Exception ex)
             {
@@ -50,21 +77,7 @@ namespace DynamicsConnector.Core.Providers
             }
         }
 
-        private ServiceBusSender GetSender(string[] parameters)
-        {
-            if (parameters.Length != 4)
-                throw new ArgumentException("Wrong Parameters Count");
-
-            string cs = parameters[0], topic = parameters[1], queue = parameters[2];
-
-            var sender = new ServiceBusClient(cs);
-            ServiceBusSender senderqueue = sender.CreateSender(queue);
-            ServiceBusSender sendertopic = sender.CreateSender(topic);
-            if (string.IsNullOrEmpty(topic))
-                return senderqueue;
-
-            return sendertopic;
-        }
+        
 
 
     }
