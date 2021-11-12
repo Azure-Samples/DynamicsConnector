@@ -15,22 +15,22 @@ namespace DynamicsConnector.Core.Providers
         {
             try
             {
-                var client = GetSender(parameters);
+                var sender = GetSender(parameters);
 
                 foreach (var dataItem in data)
                 {
                     var serializedMessage = JsonConvert.SerializeObject(dataItem);
                     var payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedMessage));
                     var msg = new ServiceBusMessage(payloadStream.ToString());
-                    if (client is ServiceBusSender serviceBusSender)
+                    if (sender is ServiceBusSender sendertopic)
                     {
                         msg.ApplicationProperties["Status"] = parameters[3];
-                        await serviceBusSender.SendMessageAsync(msg);
+                        await sendertopic.SendMessageAsync(msg);
                     }
                     else
-                    if (client is ServiceBusSender serviceBussender)
+                    if (sender is ServiceBusSender senderqueue)
                     {
-                        serviceBussender.SendMessageAsync(msg);
+                        senderqueue.SendMessageAsync(msg);
                     }
                 }
             }
@@ -44,22 +44,22 @@ namespace DynamicsConnector.Core.Providers
         {
             try
             {
-                var client = GetSender(parameters);
+                var sender = GetSender(parameters);
 
                 var serializedMessage = JsonConvert.SerializeObject(dataItem);
                 var payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedMessage));
 
                 var msg = new ServiceBusMessage(payloadStream.ToString());
 
-                if (client is ServiceBusSender serviceBusSender)
+                if (sender is ServiceBusSender sendertopic)
                 {
                     msg.ApplicationProperties["Status"] = parameters[3];
-                    await serviceBusSender.SendMessageAsync(msg);
+                    await sendertopic.SendMessageAsync(msg);
                 }
                 else
-                if (client is ServiceBusSender serviceBussender)
+                if (sender is ServiceBusSender senderqueue)
                 {
-                    serviceBussender.SendMessageAsync(msg);
+                    senderqueue.SendMessageAsync(msg);
                 }
 
             }
@@ -76,9 +76,9 @@ namespace DynamicsConnector.Core.Providers
 
             string cs = parameters[0], topic = parameters[1], queue = parameters[2];
 
-            var client = new ServiceBusClient(cs);
-            ServiceBusSender senderqueue = client.CreateSender(queue);
-            ServiceBusSender sendertopic = client.CreateSender(topic);
+            var sender = new ServiceBusClient(cs);
+            ServiceBusSender senderqueue = sender.CreateSender(queue);
+            ServiceBusSender sendertopic = sender.CreateSender(topic);
             if (string.IsNullOrEmpty(topic))
                 return senderqueue;
 
