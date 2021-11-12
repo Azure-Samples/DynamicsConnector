@@ -22,16 +22,7 @@ namespace DynamicsConnector.Core.Providers
                     var serializedMessage = JsonConvert.SerializeObject(dataItem);
                     var payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedMessage));
                     var msg = new ServiceBusMessage(payloadStream.ToString());
-                    if (sender is ServiceBusSender sendertopic)
-                    {
-                        msg.ApplicationProperties["Status"] = parameters[3];
-                        await sendertopic.SendMessageAsync(msg);
-                    }
-                    else
-                    if (sender is ServiceBusSender senderqueue)
-                    {
-                        senderqueue.SendMessageAsync(msg);
-                    }
+                    sender.SendMessageAsync(msg);
                 }
             }
             catch (Exception ex)
@@ -50,17 +41,7 @@ namespace DynamicsConnector.Core.Providers
                 var payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedMessage));
 
                 var msg = new ServiceBusMessage(payloadStream.ToString());
-
-                if (sender is ServiceBusSender sendertopic)
-                {
-                    msg.ApplicationProperties["Status"] = parameters[3];
-                    await sendertopic.SendMessageAsync(msg);
-                }
-                else
-                if (sender is ServiceBusSender senderqueue)
-                {
-                    senderqueue.SendMessageAsync(msg);
-                }
+                sender.SendMessageAsync(msg);
 
             }
             catch (Exception ex)
