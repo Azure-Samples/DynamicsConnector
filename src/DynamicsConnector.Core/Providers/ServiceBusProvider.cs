@@ -15,7 +15,7 @@ namespace DynamicsConnector.Core.Providers
         {
             try
             {
-                var client = GetClient(parameters);
+                var client = GetSender(parameters);
 
                 foreach (var dataItem in data)
                 {
@@ -44,7 +44,7 @@ namespace DynamicsConnector.Core.Providers
         {
             try
             {
-                var client = GetClient(parameters);
+                var client = GetSender(parameters);
 
                 var serializedMessage = JsonConvert.SerializeObject(dataItem);
                 var payloadStream = new MemoryStream(Encoding.UTF8.GetBytes(serializedMessage));
@@ -69,7 +69,7 @@ namespace DynamicsConnector.Core.Providers
             }
         }
 
-        private ServiceBusSender GetClient(string[] parameters)
+        private ServiceBusSender GetSender(string[] parameters)
         {
             if (parameters.Length != 4)
                 throw new ArgumentException("Wrong Parameters Count");
