@@ -1,6 +1,5 @@
-﻿using Microsoft.WindowsAzure.Storage;
-using Microsoft.WindowsAzure.Storage.Auth;
-using Microsoft.WindowsAzure.Storage.File;
+﻿using Azure.Storage;
+using Azure.Storage.Files.Shares;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,22 +12,23 @@ namespace DynamicsConnector.Core.Providers
     {
         private readonly string StorageAccountName;
         private readonly string StorageAccountKey;
-        private CloudStorageAccount storageAccount;
-        public FileStorageProvider(string storageAccountName, string storageAccountKey)
+        private readonly string BlobServiceUri;
+        private ShareServiceClient shareServiceClient;
+
+
+        public FileStorageProvider(string storageAccountName, string storageAccountKey, string blobServiceUri)
         {
             this.StorageAccountName = storageAccountName;
             this.StorageAccountKey = storageAccountKey;
-
-            storageAccount = new CloudStorageAccount(new StorageCredentials(storageAccountName, storageAccountKey), false);
+            this.BlobServiceUri = blobServiceUri;
+            shareServiceClient = new ShareServiceClient(new Uri(blobServiceUri), new StorageSharedKeyCredential(storageAccountName, storageAccountKey), default);
         }
         public string ReadFromFile(string shareName, string fileName)
-        {             
-            var share = storageAccount.CreateCloudFileClient().GetShareReference(shareName);
-
-            var rootdir = share.GetRootDirectoryReference();
-            var data = rootdir.GetFileReference(fileName).DownloadText();
-
-            return data;
+        {
+            var share = shareServiceClient.GetShareClient(shareName);
+            var rootdir = share.GetRootDirectoryClient();
+            var data = rootdir.GetFileClient(fileName).Download();
+            return data.ToString();
         }
     }
 }

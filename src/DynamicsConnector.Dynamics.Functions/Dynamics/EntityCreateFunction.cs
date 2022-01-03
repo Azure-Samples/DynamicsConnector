@@ -2,7 +2,6 @@ using DynamicsConnector.Core.Models;
 using DynamicsConnector.Core.Providers;
 using Microsoft.Azure.WebJobs;
 using Microsoft.Extensions.Logging;
-using Microsoft.ServiceBus.Messaging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -23,15 +22,15 @@ namespace DynamicsConnector.Dynamics.Functions.Dynamics
             };
 
         private static readonly string azureWebJobsStorage = ConfigurationManager.AppSettings["AzureWebJobsStorage"];
-        
+
 
         private static readonly string shareName = ConfigurationManager.AppSettings["MappingShareName"];
         private static readonly string fileName = ConfigurationManager.AppSettings["MappingFileName"];
-        
+
         #endregion
 
         [FunctionName("DynamicsEntityCreate")]
-        public static void Run([ServiceBusTrigger("entitycreate", access: AccessRights.Listen)] string mySbMsg, ILogger log)
+        public static void Run([ServiceBusTrigger("entitycreate")] string mySbMsg, ILogger log)
         {
             var startTime = DateTime.Now;
             try
@@ -41,16 +40,16 @@ namespace DynamicsConnector.Dynamics.Functions.Dynamics
                 if (mySbMsg == null)
                 {
                     throw new ArgumentNullException(nameof(mySbMsg));
-                }  
-                
+                }
+
                 _dynamicsService = new DynamicsHelper(_credentials.crmorg, _credentials.user, _credentials.password, log);
 
                 var message = JsonConvert.DeserializeObject<InstanceCreateMessage>(mySbMsg);
-                IDictionary<string, object> entityDetails = new Dictionary<string, object>();                
+                IDictionary<string, object> entityDetails = new Dictionary<string, object>();
                 var entityMapper = GetEntityMapper(message.DynamicsEntityName, log);
-                if(entityMapper != null)
+                if (entityMapper != null)
                 {
-                    foreach(var k in entityMapper)
+                    foreach (var k in entityMapper)
                     {
                         if (message.EntityDetails.ContainsKey(k.Key) && !entityDetails.ContainsKey(k.Value))
                             entityDetails.Add(k.Value, message.EntityDetails[k.Key]);
@@ -60,12 +59,12 @@ namespace DynamicsConnector.Dynamics.Functions.Dynamics
                 if (entityDetails.Count == 0)
                     entityDetails = message.EntityDetails;
 
-                if(message.Update && message.Id != Guid.Empty)
+                if (message.Update && message.Id != Guid.Empty)
                 {
                     _dynamicsService.UpdateEntityAttributes(message.DynamicsEntityName, message.Id, entityDetails);
                 }
                 else
-                _dynamicsService.CreateEntityInstance(message.DynamicsEntityName, message.DynamicsEntityToken, entityDetails, message.Update, message.MissingMappingField);
+                    _dynamicsService.CreateEntityInstance(message.DynamicsEntityName, message.DynamicsEntityToken, entityDetails, message.Update, message.MissingMappingField);
             }
             catch (Exception exception)
             {
@@ -83,17 +82,19 @@ namespace DynamicsConnector.Dynamics.Functions.Dynamics
                 return null;
 
             var storageParams = azureWebJobsStorage.Split(';');
-            string storageAccountKey = "", storageAccountName = "";
+            string storageAccountKey = "", storageAccountName = "", blobServiceUri = "";
 
             foreach (var p in storageParams)
             {
                 if (p.StartsWith("AccountName"))
                     storageAccountName = p.Substring(p.IndexOf('=') + 1);
-                if(p.StartsWith("AccountKey"))
+                if (p.StartsWith("AccountKey"))
                     storageAccountKey = p.Substring(p.IndexOf('=') + 1);
-            } 
+                if (p.StartsWith("AccountUri"))
+                    storageAccountKey = p.Substring(p.IndexOf('=') + 1);
+            }
 
-            if (string.IsNullOrEmpty(storageAccountKey) || string.IsNullOrEmpty(storageAccountName))
+            if (string.IsNullOrEmpty(storageAccountKey) || string.IsNullOrEmpty(storageAccountName) || string.IsNullOrEmpty(blobServiceUri))
             {
                 log.LogInformation($"Storgae account Key or Name hasn't been set!");
                 return null;
@@ -105,7 +106,7 @@ namespace DynamicsConnector.Dynamics.Functions.Dynamics
                 return null;
             }
 
-            var fileStorageProvider = new FileStorageProvider(storageAccountName, storageAccountKey);
+            var fileStorageProvider = new FileStorageProvider(storageAccountName, storageAccountKey, blobServiceUri);
 
             var encoded = fileStorageProvider.ReadFromFile(shareName, fileName);
             var decodedMessage = JsonConvert.DeserializeObject<Dictionary<string, Dictionary<string, string>>>(encoded);
@@ -113,7 +114,7 @@ namespace DynamicsConnector.Dynamics.Functions.Dynamics
             if (decodedMessage != null && decodedMessage.ContainsKey(entityName))
                 return decodedMessage[entityName];
             else
-                return null;  
-        }            
+                return null;
+        }
     }
 }
